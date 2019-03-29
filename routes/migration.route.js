@@ -6,8 +6,12 @@ const cassandra = require('../migration/cassandra');
 routes.route('/migration').get(async (req, res) => {
     try {
         const mysqlInvoices = await mysql.getInvoices();
-        const result = await cassandra.insertInvoices(mysqlInvoices);
-        res.json(result);
+        let count = 0;
+        for(const invoice of mysqlInvoices) {
+            const result = await cassandra.insertInvoice(count, invoice);
+            count++;
+        }
+        res.json({ count });
     } catch (e) {
         res.json(e);
     }

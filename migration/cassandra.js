@@ -5,7 +5,9 @@ USE invoices
 
 CREATE TABLE invoices
 (
+  id                 double,
   invoiceNumber      double,
+  serviceNumber      double,
   customerName       text,
   customerAddress    text,
   serviceDescription text,
@@ -17,7 +19,7 @@ CREATE TABLE invoices
   serviceDiscount    double,
   serviceSubtotal    double,
   invoiceValue       double,
-  PRIMARY KEY (invoiceNumber)
+  PRIMARY KEY (serviceNumber)
 )
 */
 
@@ -29,7 +31,9 @@ const client = new cassandra.Client({
 });
 
 const queryInsert = `INSERT INTO invoices (
+id,
 invoiceNumber,
+serviceNumber,
 customerName,
 customerAddress,
 serviceDescription,
@@ -41,9 +45,29 @@ serviceTax,
 serviceDiscount,
 serviceSubtotal,
 invoiceValue
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
 const cassandraModule = {
+    insertInvoice: (id, invoice) => {
+
+        return client.execute(queryInsert, [
+            id,
+            invoice.invoiceNumber,
+            invoice.serviceNumber,
+            invoice.customerName,
+            invoice.customerAddress,
+            invoice.serviceDescription,
+            invoice.serviceQuantity,
+            invoice.serviceValue,
+            invoice.resourceName,
+            invoice.resourceFunction,
+            invoice.serviceTax,
+            invoice.serviceDiscount,
+            invoice.serviceSubtotal,
+            invoice.invoiceValue
+        ]);
+
+    },
     insertInvoices: (invoices) => {
 
         let queries = [];
@@ -55,6 +79,7 @@ const cassandraModule = {
                 query: queryInsert,
                 params: [
                     i.invoiceNumber,
+                    i.serviceNumber,
                     i.customerName,
                     i.customerAddress,
                     i.serviceDescription,
@@ -83,7 +108,7 @@ const cassandraModule = {
     },
     getInvoice: async (invoiceNumber) => {
 
-        const query = 'SELECT * FROM invoices WHERE invoiceNumber = ?';
+        const query = 'SELECT * FROM invoices WHERE invoiceNumber = ? ALLOW FILTERING';
         const invoice = await client.execute(query, [parseInt(invoiceNumber)]);
 
         const invoiceRow = invoice.rows[0];
@@ -98,13 +123,14 @@ const cassandraModule = {
         if (invoice && invoice.rows.length) {
             invoice.rows.forEach(item => {
                 invoiceObj.items.push({
+                    serviceNumber: item.servicenumber,
                     serviceDescription: item.servicedescription,
                     serviceQuantity: item.servicequantity,
                     serviceValue: item.servicevalue,
                     resourceName: item.resourcename,
                     resourceFunction: item.resourcefunction,
-                    serviceTax: item.servicetax,
-                    serviceDiscount: item.servicediscount,
+                    serviceTax: item.servicetax * item.servicevalue,
+                    serviceDiscount: item.servicediscount * item.servicevalue,
                     serviceSubtotal: item.servicesubtotal
                 })
             });
