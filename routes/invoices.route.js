@@ -1,7 +1,9 @@
 const express = require('express');
 const routes = express.Router();
 
-const fs = require('fs');
+const fs = require('fs'),
+      pdf = require('html-pdf'),
+      cassandra = require('cassandra-driver');
 
 let templateHtml = fs.readFileSync('./test.html', 'utf8');
 const options = { format: 'A4' };
@@ -12,18 +14,9 @@ const options = { format: 'A4' };
 //     keyspace: 'chat'
 // });
 
-routes.route('/invoices/:invoice_number').get(function (req, res) {
+routes.route('/invoices/:invoice_number').get(function (req, response) {
     let invoice_number = req.params.invoice_number;
-
-    // res.writeHead(200, {
-    //     'Content-Type': 'application/pdf',
-    //     'Content-disposition': `attachment; filename=test.pdf`,
-    // });
-
-    // pdf.create(templateHtml, options).toStream((err, stream) => {
-    //     stream.pipe(res);
-    // });
-
+    
     invoices = [
         {
             servicedescription: "Maintenance of workflow system",
@@ -47,10 +40,19 @@ routes.route('/invoices/:invoice_number').get(function (req, res) {
         }
     ];
 
-    res.render('test.html', {"invoices": invoices});
-
+    response.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-disposition': `attachment; filename=test.pdf`,
+    });
+    
+    response.render('test.html', {"invoices": invoices}, function(err, templateHTML) {
+        pdf.create(templateHTML, options).toStream((err, stream) => {
+            stream.pipe(response);
+        });
+    });
+    
     // const query = 'SELECT * FROM users';
-
+    
     // client
     // .execute(query)
     // .then(result => {
@@ -58,7 +60,7 @@ routes.route('/invoices/:invoice_number').get(function (req, res) {
     //     templateHtml = templateHtml.replace('{{ invoicenumber }}', 1946369);
     //     templateHtml = templateHtml.replace('{{ customername }}', "Pirelli");
     //     templateHtml = templateHtml.replace('{{ customeraddress }}', "Viale Piero e Alberto Pirelli n. 25 (reception in Via Bicocca degli Arcimboldi, 3) 20126 Milan");
-
+    
     //     invoices = [
     //         {
     //             servicedescription: "Maintenance of workflow system",
@@ -81,9 +83,9 @@ routes.route('/invoices/:invoice_number').get(function (req, res) {
     //             servicesubtotal: "$1510.39"
     //         }
     //     ];
-
+    
     //     // templateHtml = templateHtml.replace('{{ invoice }}', invoice);
-
+    
     //     // templateHtml = templateHtml.replace('{{ servicedescription }}', "Maintenance of workflow system");
     //     // templateHtml = templateHtml.replace('{{ servicequantity }}', 32);
     //     // templateHtml = templateHtml.replace('{{ servicevalue }}', "$40.00");
@@ -92,20 +94,18 @@ routes.route('/invoices/:invoice_number').get(function (req, res) {
     //     // templateHtml = templateHtml.replace('{{ servicetax }}', "0.25");
     //     // templateHtml = templateHtml.replace('{{ servicediscount }}', "0.07");
     //     // templateHtml = templateHtml.replace('{{ servicesubtotal }}', "$1510.39");
-
+    
     //     templateHtml = templateHtml.replace('{{ invoicevalue }}', "$6465.39");
-
+    
     //     res.writeHead(200, {
     //         'Content-Type': 'application/pdf',
     //         'Content-disposition': `attachment; filename=test.pdf`,
     //     });
-
+    
     //     pdf.create(templateHtml, options).toStream((err, stream) => {
     //         stream.pipe(res);
     //     });
     // });
-
-
 });
 
 module.exports = routes;

@@ -1,9 +1,7 @@
 const express = require('express'),
 	bodyParser = require('body-parser'),
 	cors = require('cors'),
-	nunjucks = require('nunjucks'),
-	pdf = require('html-pdf'),
-	cassandra = require('cassandra-driver');
+	nunjucks = require('nunjucks');	
 
 const routes = require('./routes/invoices.route');
 
@@ -24,10 +22,6 @@ nunjucks.configure(_templates, {
 // Set Nunjucks as rendering engine for pages with .html suffix
 app.engine('html', nunjucks.render);
 app.set('view engine', 'html');
-
-// Set Nunjucks as rendering engine for pages with .html suffix
-// app.engine( 'html', nunjucks.render ) ;
-// app.set('view engine', 'html');
 
 const server = app.listen(port, function () {
 	console.log('Listening on port ' + port);
