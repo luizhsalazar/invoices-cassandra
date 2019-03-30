@@ -122,6 +122,7 @@ const cassandraModule = {
 
         if (invoice && invoice.rows.length) {
             invoice.rows.forEach(item => {
+                const totalValue = item.servicevalue * item.servicequantity;
                 invoiceObj.items.push({
                     serviceNumber: item.servicenumber,
                     serviceDescription: item.servicedescription,
@@ -129,8 +130,8 @@ const cassandraModule = {
                     serviceValue: item.servicevalue.toFixed(2),
                     resourceName: item.resourcename,
                     resourceFunction: item.resourcefunction,
-                    serviceTax: (item.servicetax * item.servicevalue).toFixed(2),
-                    serviceDiscount: (item.servicediscount * item.servicevalue).toFixed(2),
+                    serviceTax: (item.servicetax * totalValue).toFixed(2),
+                    serviceDiscount: (item.servicediscount * totalValue).toFixed(2),
                     serviceSubtotal: item.servicesubtotal.toFixed(2)
                 })
             });

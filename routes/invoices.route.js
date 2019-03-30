@@ -22,8 +22,8 @@ routes.route('/invoices/:invoice_number').get(async (req, response) => {
                 stream.pipe(response);
             });            
         });
-    } catch (e) {
-        response.json(e);
+    } catch (e) {        
+        response.send("<strong>Nota não encontrada</strong>");
     }
 });
 
