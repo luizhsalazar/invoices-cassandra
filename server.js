@@ -9,7 +9,6 @@ app.use(cors());
 app.use(require('./routes/invoices.route'));
 app.use(require('./routes/migration.route'));
 
-
 const port = process.env.PORT || 4000;
 
 // Configure Nunjucks

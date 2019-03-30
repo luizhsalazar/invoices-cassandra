@@ -7,8 +7,8 @@ const mysql = require('mysql');
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '',
-    database: 'invoices'
+    password: 'root',
+    database: 'invoice_cassandra'
 });
 
 connection.connect();

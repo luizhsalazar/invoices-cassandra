@@ -33,7 +33,7 @@
 		}
 
 		.invoice-box table tr.top table td {
-			padding-bottom: 20px;
+			padding-bottom: 5px;
 		}
 
 		.invoice-box table tr.top table td.title {
@@ -43,7 +43,7 @@
 		}
 
 		.invoice-box table tr.information table td {
-			padding-bottom: 40px;
+			padding-bottom: 10px;
 		}
 
 		.invoice-box table tr.heading td {
@@ -113,7 +113,7 @@
 							</td>
 
 							<td>
-								Invoice: <strong>#{{ invoicenumber }}</strong><br>
+								Invoice: <strong>#{{ invoice.invoiceNumber }}</strong><br>
 							</td>
 						</tr>
 					</table>
@@ -125,8 +125,8 @@
 					<table>
 						<tr>
 							<td>
-								<strong>{{ customername }}</strong><br>
-								{{ customeraddress }}
+								<strong>{{ invoice.customerName }}</strong><br>
+								{{ invoice.customerAddress }}
 							</td>
 						</tr>
 					</table>
@@ -144,16 +144,16 @@
 				<td>Subtotal</td>
 			</tr>
 
-			{% for item in invoices %}
+			{% for item in invoice.items %}
 			<tr class="item">
-				<td>{{ item.servicedescription }}</td>
-				<td>{{ item.servicequantity }}</td>
-				<td>{{ item.servicevalue }}</td>
-				<td>{{ item.resourcename }}</td>
-				<td>{{ item.resourcefunction }}</td>
-				<td>{{ item.servicetax }}</td>
-				<td>{{ item.servicediscount }}</td>
-				<td>{{ item.servicesubtotal }}</td>
+				<td>{{ item.serviceDescription }}</td>
+				<td>{{ item.serviceQuantity }}</td>
+				<td>${{ item.serviceValue }}</td>
+				<td>{{ item.resourceName }}</td>
+				<td>{{ item.resourceFunction }}</td>
+				<td>{{ item.serviceTax }}%</td>
+				<td>{{ item.serviceDiscount }}%</td>
+				<td>${{ item.serviceSubtotal }}</td>
 			</tr>
 			{% endfor %}
 
@@ -166,7 +166,7 @@
 				<td></td>
 				<td><strong>Total:</strong></td>
 				<td>
-					{{ invoicevalue }}
+					${{ invoice.invoiceValue }}
 				</td>
 			</tr>
 		</table>

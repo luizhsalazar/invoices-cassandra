@@ -25,7 +25,7 @@ CREATE TABLE invoices
 
 const cassandra = require('cassandra-driver');
 const client = new cassandra.Client({
-    contactPoints: ['localhost'],
+    contactPoints: ['localhost:9042'],
     localDataCenter: 'datacenter1',
     keyspace: 'invoices'
 });
@@ -116,7 +116,7 @@ const cassandraModule = {
             invoiceNumber: invoiceRow.invoicenumber,
             customerName: invoiceRow.customername,
             customerAddress: invoiceRow.customeraddress,
-            invoiceValue: invoiceRow.invoicevalue,
+            invoiceValue: invoiceRow.invoicevalue.toFixed(2),
             items: []
         };
 
@@ -126,12 +126,12 @@ const cassandraModule = {
                     serviceNumber: item.servicenumber,
                     serviceDescription: item.servicedescription,
                     serviceQuantity: item.servicequantity,
-                    serviceValue: item.servicevalue,
+                    serviceValue: item.servicevalue.toFixed(2),
                     resourceName: item.resourcename,
                     resourceFunction: item.resourcefunction,
-                    serviceTax: item.servicetax * item.servicevalue,
-                    serviceDiscount: item.servicediscount * item.servicevalue,
-                    serviceSubtotal: item.servicesubtotal
+                    serviceTax: (item.servicetax * item.servicevalue).toFixed(2),
+                    serviceDiscount: (item.servicediscount * item.servicevalue).toFixed(2),
+                    serviceSubtotal: item.servicesubtotal.toFixed(2)
                 })
             });
         }
